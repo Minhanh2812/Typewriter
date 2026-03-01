@@ -1,40 +1,96 @@
-const kbContent = document.getElementById('keyboard-content');
+const kbRows = document.getElementById('keyboard-rows');
 const paper = document.getElementById('paper');
-const paperSection = document.querySelector('.paper-section');
+const scrollContainer = document.querySelector('.scroll-container');
 const clickSound = new Audio('https://www.soundjay.com/communication/typewriter-key-1.mp3');
 
 let isNumbers = false;
 let isCaps = false;
 
+// Bộ bố cục đầy đủ phím
 const layouts = {
-    abc: [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['z','x','c','v','b','n','m','Backspace']],
-    num: [['1','2','3','4','5','6','7','8','9','0'],['-','/',':',';','(',')','$','&','@','"'],['.',',','?','!','\'','_','+','=','Backspace']]
+    abc: [
+        ['1','2','3','4','5','6','7','8','9','0'], // Hàng số luôn hiện
+        ['q','w','e','r','t','y','u','i','o','p'],
+        ['a','s','d','f','g','h','j','k','l'],
+        ['z','x','c','v','b','n','m',',','.','Backspace']
+    ],
+    num: [
+        ['!','@','#','$','%','^','&','*','(',')'],
+        ['+','=','-','_','[',']','{','}','\\','|'],
+        [';',':','\'','"','<','>','/','?','`','~'],
+        ['Backspace']
+    ]
 };
 
 function renderKeyboard() {
-    kbContent.innerHTML = '';
-    const layout = isNumbers ? layouts.num : layouts.abc;
+    kbRows.innerHTML = '';
+    const currentLayout = isNumbers ? layouts.num : layouts.abc;
 
-    layout.forEach(row => {
+    currentLayout.forEach(row => {
         const rowDiv = document.createElement('div');
         rowDiv.className = 'row';
         row.forEach(key => {
             const keyDiv = document.createElement('div');
-            keyDiv.className = `key ${key === 'Backspace' ? 'special' : ''}`;
+            keyDiv.className = `key ${key === 'Backspace' ? 'special-btn' : ''}`;
+            
             let display = key;
-            if (!isNumbers && key !== 'Backspace') display = isCaps ? key.toUpperCase() : key.toLowerCase();
+            if (!isNumbers && key.length === 1) {
+                display = isCaps ? key.toUpperCase() : key.toLowerCase();
+            }
             keyDiv.innerText = key === 'Backspace' ? '⌫' : display;
             
-            const trigger = (e) => { e.preventDefault(); handleInput(key); };
-            keyDiv.addEventListener('mousedown', trigger);
-            keyDiv.addEventListener('touchstart', trigger, {passive: false});
+            const press = (e) => { e.preventDefault(); handleInput(key); };
+            keyDiv.addEventListener('mousedown', press);
+            keyDiv.addEventListener('touchstart', press, {passive: false});
             rowDiv.appendChild(keyDiv);
         });
-        kbContent.appendChild(rowDiv);
+        kbRows.appendChild(rowDiv);
     });
-    document.getElementById('btn-toggle').innerText = isNumbers ? 'ABC' : '123';
 }
 
+function handleInput(key) {
+    clickSound.currentTime = 0;
+    clickSound.play().catch(() => {});
+
+    if (key === 'Backspace') {
+        paper.innerText = paper.innerText.slice(0, -1);
+    } else if (key === 'Enter') {
+        paper.innerHTML += '<br>';
+    } else if (key === ' ') {
+        paper.innerHTML += '\u00A0';
+    } else {
+        let char = key;
+        if (!isNumbers && key.length === 1) {
+            char = isCaps ? key.toUpperCase() : key.toLowerCase();
+        }
+        paper.innerText += char;
+    }
+    // Luôn cuộn xuống dòng mới nhất
+    scrollContainer.scrollTop = scrollContainer.scrollHeight;
+}
+
+// Gán nút chức năng
+document.getElementById('btn-toggle').onclick = (e) => {
+    isNumbers = !isNumbers;
+    document.getElementById('btn-toggle').innerText = isNumbers ? 'ABC' : '123';
+    renderKeyboard();
+};
+
+document.getElementById('btn-caps').onclick = (e) => {
+    isCaps = !isCaps;
+    document.getElementById('btn-caps').classList.toggle('caps-active');
+    renderKeyboard();
+};
+
+document.querySelector('.space-bar').onclick = () => handleInput(' ');
+document.querySelector('.enter-btn').onclick = () => handleInput('Enter');
+document.getElementById('btn-save').onclick = () => {
+    const blob = new Blob([paper.innerText], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'notes.txt'; a.click();
+};
+
+renderKeyboard();
 function handleInput(key) {
     clickSound.currentTime = 0;
     clickSound.play().catch(() => {});
