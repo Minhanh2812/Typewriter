@@ -1,40 +1,86 @@
-const kbRows = document.getElementById('keyboard-rows');
+const kbContent = document.getElementById('keyboard-content');
 const paper = document.getElementById('paper');
-const scrollContainer = document.querySelector('.scroll-container');
+const scrollWrapper = document.querySelector('.scroll-wrapper');
 const clickSound = new Audio('https://www.soundjay.com/communication/typewriter-key-1.mp3');
 
-let isNumbers = false;
-let isCaps = false;
+let isNumbers = false; let isCaps = false;
 
-// Bộ bố cục đầy đủ phím
+// Bố cục bàn phím chuẩn
 const layouts = {
     abc: [
-        ['1','2','3','4','5','6','7','8','9','0'], // Hàng số luôn hiện
+        ['1','2','3','4','5','6','7','8','9','0'],
         ['q','w','e','r','t','y','u','i','o','p'],
         ['a','s','d','f','g','h','j','k','l'],
-        ['z','x','c','v','b','n','m',',','.','Backspace']
+        ['z','x','c','v','b','n','m','⌫']
     ],
     num: [
         ['!','@','#','$','%','^','&','*','(',')'],
         ['+','=','-','_','[',']','{','}','\\','|'],
         [';',':','\'','"','<','>','/','?','`','~'],
-        ['Backspace']
+        ['⌫']
     ]
 };
 
 function renderKeyboard() {
-    kbRows.innerHTML = '';
-    const currentLayout = isNumbers ? layouts.num : layouts.abc;
-
-    currentLayout.forEach(row => {
+    kbContent.innerHTML = ''; // Xóa sạch để không bị lặp nút
+    const layout = isNumbers ? layouts.num : layouts.abc;
+    
+    layout.forEach(row => {
         const rowDiv = document.createElement('div');
         rowDiv.className = 'row';
         row.forEach(key => {
             const keyDiv = document.createElement('div');
-            keyDiv.className = `key ${key === 'Backspace' ? 'special-btn' : ''}`;
+            keyDiv.className = `key ${key === '⌫' ? 'spec' : ''}`;
+            let display = (!isNumbers && key.length === 1) ? (isCaps ? key.toUpperCase() : key.toLowerCase()) : key;
+            keyDiv.innerText = display;
             
-            let display = key;
-            if (!isNumbers && key.length === 1) {
+            const trigger = (e) => { e.preventDefault(); handleInput(key); };
+            keyDiv.addEventListener('mousedown', trigger);
+            keyDiv.addEventListener('touchstart', trigger, {passive: false});
+            rowDiv.appendChild(keyDiv);
+        });
+        kbContent.appendChild(rowDiv);
+    });
+
+    // Thêm hàng cuối cùng (Chức năng) vào ngay trong keyboard-content
+    const footerRow = document.createElement('div');
+    footerRow.className = 'row';
+    footerRow.innerHTML = `
+        <div class="key spec" id="btn-toggle">${isNumbers ? 'ABC' : '123'}</div>
+        <div class="key spec ${isCaps ? 'caps-active' : ''}" id="btn-caps">CAPS</div>
+        <div class="key space">SPACE</div>
+        <div class="key enter">RETURN</div>
+        <div class="key save" id="btn-save">SAVE</div>
+    `;
+    kbContent.appendChild(footerRow);
+
+    // Gán lại sự kiện cho các nút vừa tạo
+    document.getElementById('btn-toggle').onclick = () => { isNumbers = !isNumbers; renderKeyboard(); };
+    document.getElementById('btn-caps').onclick = () => { isCaps = !isCaps; renderKeyboard(); };
+    document.querySelector('.key.space').onclick = () => handleInput(' ');
+    document.querySelector('.key.enter').onclick = () => handleInput('Enter');
+    document.getElementById('btn-save').onclick = saveFile;
+}
+
+function handleInput(key) {
+    clickSound.currentTime = 0; clickSound.play().catch(()=>{});
+    if (key === '⌫') paper.innerText = paper.innerText.slice(0, -1);
+    else if (key === 'Enter') paper.innerHTML += '<br>';
+    else if (key === ' ') paper.innerHTML += '\u00A0';
+    else {
+        let char = (!isNumbers && key.length === 1) ? (isCaps ? key.toUpperCase() : key.toLowerCase()) : key;
+        paper.innerText += char;
+    }
+    scrollWrapper.scrollTop = scrollWrapper.scrollHeight;
+}
+
+function saveFile() {
+    const blob = new Blob([paper.innerText], {type:'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'typing.txt'; a.click();
+}
+
+renderKeyboard();            if (!isNumbers && key.length === 1) {
                 display = isCaps ? key.toUpperCase() : key.toLowerCase();
             }
             keyDiv.innerText = key === 'Backspace' ? '⌫' : display;
