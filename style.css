@@ -3,38 +3,66 @@
 body { 
     background-color: #FFDDEE; 
     font-family: 'Courier New', Courier, monospace;
-    height: 100vh; /* Ép toàn bộ giao diện nằm trong màn hình */
-    width: 100vw;
-    overflow: hidden; /* Không cho cả trang web bị cuộn */
-    display: grid;
-    grid-template-rows: 1fr auto; /* Trên: Giấy (tự co dãn), Dưới: Bàn phím (vừa đủ kích thước) */
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Chống cuộn toàn trang */
 }
 
-/* KHU VỰC TỜ GIẤY */
-.paper-area {
-    width: 100%;
-    overflow-y: auto; /* Chỉ cho phép cuộn bên trong tờ giấy */
+/* PHẦN GIẤY: Chiếm phần trên, tự cuộn khi dài */
+.paper-section {
+    flex: 1; /* Tự động lấy hết phần trống phía trên */
+    overflow-y: auto;
     display: flex;
     justify-content: center;
-    padding: 20px 0;
-}
-
-#paper-wrapper { 
-    background-color: #f4f1ea; 
-    width: 95%; 
-    max-width: 800px; 
-    min-height: 80vh; 
-    padding: 40px; 
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
+    padding: 20px 10px;
 }
 
 #paper { 
-    outline: none; 
-    font-size: clamp(18px, 2.5vw, 24px); 
-    line-height: 1.6; 
-    color: #333; 
-    white-space: pre-wrap; 
+    background-color: #f4f1ea; 
+    width: 100%;
+    max-width: 800px;
+    min-height: 100%;
+    padding: 40px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    outline: none;
+    font-size: 20px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* PHẦN BÀN PHÍM: Cố định ở đáy */
+.keyboard-section {
+    background: #1a1a1a;
+    padding: 10px 5px 30px 5px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+}
+
+.row { display: flex; justify-content: center; margin: 3px 0; gap: 4px; width: 100%; }
+
+.key { 
+    width: clamp(30px, 8vw, 50px); 
+    height: clamp(40px, 10vw, 55px);
+    background: #333; color: white; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    border-bottom: 4px solid #000;
+    cursor: pointer; font-weight: bold; font-size: 16px;
+    user-select: none;
+}
+
+.key:active { transform: translateY(2px); border-bottom-width: 1px; }
+
+/* Phím đặc biệt */
+.key.wide { width: clamp(50px, 12vw, 80px); font-size: 12px; background: #444; }
+.key.space { width: clamp(120px, 40vw, 400px); }
+.key.enter { background: #e67e22; width: clamp(70px, 15vw, 100px); }
+.key.save { background: #27ae60; width: clamp(50px, 12vw, 80px); }
+.caps-on { background: #ff88aa !important; color: #000 !important; }    white-space: pre-wrap; 
     word-wrap: break-word;
 }
 
