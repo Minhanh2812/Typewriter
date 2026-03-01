@@ -1,11 +1,10 @@
-const kbContent = document.getElementById('keyboard-content');
 const paper = document.getElementById('paper');
-const scrollWrapper = document.querySelector('.scroll-wrapper');
+const kbContent = document.getElementById('keyboard-content');
 const clickSound = new Audio('https://www.soundjay.com/communication/typewriter-key-1.mp3');
 
-let isNumbers = false; let isCaps = false;
+let isNum = false;
+let isCaps = false;
 
-// Bố cục bàn phím chuẩn
 const layouts = {
     abc: [
         ['1','2','3','4','5','6','7','8','9','0'],
@@ -15,26 +14,71 @@ const layouts = {
     ],
     num: [
         ['!','@','#','$','%','^','&','*','(',')'],
-        ['+','=','-','_','[',']','{','}','\\','|'],
-        [';',':','\'','"','<','>','/','?','`','~'],
+        ['-','/',':',';','[',']','{','}','\\','|'],
+        ['?','!','\'','"',',','.','<','>','+','='],
         ['⌫']
     ]
 };
 
-function renderKeyboard() {
-    kbContent.innerHTML = ''; // Xóa sạch để không bị lặp nút
-    const layout = isNumbers ? layouts.num : layouts.abc;
-    
-    layout.forEach(row => {
-        const rowDiv = document.createElement('div');
-        rowDiv.className = 'row';
-        row.forEach(key => {
-            const keyDiv = document.createElement('div');
-            keyDiv.className = `key ${key === '⌫' ? 'spec' : ''}`;
-            let display = (!isNumbers && key.length === 1) ? (isCaps ? key.toUpperCase() : key.toLowerCase()) : key;
-            keyDiv.innerText = display;
+function render() {
+    kbContent.innerHTML = '';
+    const rows = isNum ? layouts.num : layouts.abc;
+
+    rows.forEach(row => {
+        const div = document.createElement('div');
+        div.className = 'row';
+        row.forEach(k => {
+            const btn = document.createElement('div');
+            btn.className = `key ${k === '⌫' ? 'wide' : ''}`;
+            btn.innerText = (k.length === 1 && isCaps && !isNum) ? k.toUpperCase() : k;
             
-            const trigger = (e) => { e.preventDefault(); handleInput(key); };
+            const play = (e) => { e.preventDefault(); handle(k); };
+            btn.addEventListener('touchstart', play, {passive: false});
+            btn.addEventListener('mousedown', play);
+            div.appendChild(btn);
+        });
+        kbContent.appendChild(div);
+    });
+
+    // Hàng cuối
+    const lastRow = document.createElement('div');
+    lastRow.className = 'row';
+    lastRow.innerHTML = `
+        <div class="key wide" id="tgl">${isNum ? 'ABC' : '123'}</div>
+        <div class="key wide ${isCaps ? 'caps-on' : ''}" id="cps">CAPS</div>
+        <div class="key space">SPACE</div>
+        <div class="key enter">RETURN</div>
+        <div class="key save" id="sv">SAVE</div>
+    `;
+    kbContent.appendChild(lastRow);
+
+    document.getElementById('tgl').onclick = () => { isNum = !isNum; render(); };
+    document.getElementById('cps').onclick = () => { isCaps = !isCaps; render(); };
+    document.getElementById('sv').onclick = save;
+    document.querySelector('.space').onclick = () => handle(' ');
+    document.querySelector('.enter').onclick = () => handle('Enter');
+}
+
+function handle(k) {
+    clickSound.currentTime = 0; clickSound.play().catch(()=>{});
+    if (k === '⌫') paper.innerText = paper.innerText.slice(0, -1);
+    else if (k === 'Enter') paper.innerHTML += '<br>';
+    else if (k === ' ') paper.innerHTML += '\u00A0';
+    else {
+        let char = (k.length === 1 && isCaps && !isNum) ? k.toUpperCase() : k;
+        paper.innerText += char;
+    }
+    // Tự động cuộn giấy xuống cuối
+    document.querySelector('.paper-section').scrollTop = document.querySelector('.paper-section').scrollHeight;
+}
+
+function save() {
+    const blob = new Blob([paper.innerText], {type:'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'typing.txt'; a.click();
+}
+
+render();            const trigger = (e) => { e.preventDefault(); handleInput(key); };
             keyDiv.addEventListener('mousedown', trigger);
             keyDiv.addEventListener('touchstart', trigger, {passive: false});
             rowDiv.appendChild(keyDiv);
