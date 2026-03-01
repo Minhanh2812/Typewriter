@@ -15,7 +15,7 @@ const layouts = {
 };
 
 function renderKeyboard() {
-    kbContent.innerHTML = '';
+    kbContent.innerHTML = ''; // Xóa sạch để không bị lặp phím
     const layout = isNumbers ? layouts.num : layouts.abc;
 
     layout.forEach(row => {
@@ -29,12 +29,57 @@ function renderKeyboard() {
             if (!isNumbers && key !== 'Backspace') display = isCaps ? key.toUpperCase() : key.toLowerCase();
             keyDiv.innerText = key === 'Backspace' ? '⌫' : display;
             
-            // Lắng nghe cả Touch (Mobile) và Mouse (Laptop)
             const handleAction = (e) => {
                 e.preventDefault();
                 handleInput(key);
             };
             keyDiv.addEventListener('touchstart', handleAction, {passive: false});
+            keyDiv.addEventListener('mousedown', handleAction);
+            
+            rowDiv.appendChild(keyDiv);
+        });
+        kbContent.appendChild(rowDiv);
+    });
+    btnToggle.innerText = isNumbers ? 'ABC' : '123';
+}
+
+function handleInput(key) {
+    clickSound.currentTime = 0;
+    clickSound.play().catch(() => {});
+
+    if (key === 'Backspace') {
+        paper.innerText = paper.innerText.slice(0, -1);
+    } else if (key === 'Enter') {
+        paper.innerHTML += '<br>';
+    } else if (key === ' ') {
+        paper.innerHTML += '\u00A0';
+    } else if (key !== 'Backspace') {
+        let char = key;
+        if (!isNumbers) char = isCaps ? key.toUpperCase() : key.toLowerCase();
+        paper.innerText += char;
+    }
+}
+
+// Gán sự kiện nút chức năng
+const bindBtn = (el, fn) => {
+    if(!el) return;
+    el.addEventListener('touchstart', (e) => { e.preventDefault(); fn(); }, {passive: false});
+    el.addEventListener('mousedown', (e) => { e.preventDefault(); fn(); });
+};
+
+bindBtn(btnToggle, () => { isNumbers = !isNumbers; renderKeyboard(); });
+bindBtn(btnCaps, () => { isCaps = !isCaps; btnCaps.classList.toggle('caps-active'); renderKeyboard(); });
+bindBtn(document.querySelector('.key.space'), () => handleInput(' '));
+bindBtn(document.querySelector('.key.enter'), () => handleInput('Enter'));
+bindBtn(btnSave, () => {
+    const blob = new Blob([paper.innerText], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'typing_note.txt';
+    a.click();
+});
+
+renderKeyboard();            keyDiv.addEventListener('touchstart', handleAction, {passive: false});
             keyDiv.addEventListener('mousedown', handleAction);
             
             rowDiv.appendChild(keyDiv);
