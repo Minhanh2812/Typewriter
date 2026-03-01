@@ -3,38 +3,92 @@
 body { 
     background-color: #FFDDEE; 
     font-family: 'Courier New', Courier, monospace;
-    height: 100vh; width: 100vw; overflow: hidden;
-    display: flex; flex-direction: column; align-items: center;
+    height: 100vh; /* Ép toàn bộ giao diện nằm trong màn hình */
+    width: 100vw;
+    overflow: hidden; /* Không cho cả trang web bị cuộn */
+    display: grid;
+    grid-template-rows: 1fr auto; /* Trên: Giấy (tự co dãn), Dưới: Bàn phím (vừa đủ kích thước) */
 }
 
-/* VÙNG GIẤY: Căn giữa, sát trên, tự cuộn */
-.scroll-wrapper {
-    width: 100%; flex: 1;
-    overflow-y: auto; display: flex; justify-content: center;
-    padding: 20px 0 350px 0; /* Chừa khoảng trống cực lớn ở dưới cho bàn phím */
+/* KHU VỰC TỜ GIẤY */
+.paper-area {
+    width: 100%;
+    overflow-y: auto; /* Chỉ cho phép cuộn bên trong tờ giấy */
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
 }
 
-#paper-container { 
+#paper-wrapper { 
     background-color: #f4f1ea; 
-    width: 90%; max-width: 800px; 
-    min-height: 500px; padding: 40px;
+    width: 95%; 
+    max-width: 800px; 
+    min-height: 80vh; 
+    padding: 40px; 
     box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    align-self: flex-start; /* Ép sát lên trên */
+    margin-bottom: 20px;
 }
 
-#paper { outline: none; font-size: 22px; line-height: 1.6; color: #333; white-space: pre-wrap; }
+#paper { 
+    outline: none; 
+    font-size: clamp(18px, 2.5vw, 24px); 
+    line-height: 1.6; 
+    color: #333; 
+    white-space: pre-wrap; 
+    word-wrap: break-word;
+}
 
-/* BÀN PHÍM: Ép hiện ra bằng Position Fixed cụ thể */
-.keyboard-fixed {
-    position: fixed;
-    bottom: 20px; /* Cách đáy một khoảng để chắc chắn không bị ẩn */
-    left: 50%; transform: translateX(-50%); /* Luôn luôn ở giữa */
+/* KHU VỰC BÀN PHÍM */
+.keyboard-section {
     background: #1a1a1a;
-    padding: 15px; border-radius: 20px;
-    box-shadow: 0 -5px 30px rgba(0,0,0,0.4);
-    z-index: 9999;
-    width: auto; min-width: 320px;
+    padding: 15px 5px 30px 5px; /* Thêm padding dưới để tránh dính lề điện thoại */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+    z-index: 100;
 }
+
+.row { 
+    display: flex; 
+    justify-content: center; 
+    margin: 4px 0; 
+    width: 100%; 
+    gap: 4px; /* Khoảng cách giữa các phím */
+}
+
+.key { 
+    width: clamp(33px, 8vw, 52px); 
+    height: clamp(45px, 10vw, 55px);
+    background: #333; 
+    color: white; 
+    border-radius: 8px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    border: 1px solid #444; 
+    border-bottom: 4px solid #000; 
+    cursor: pointer; 
+    font-weight: bold; 
+    font-size: clamp(14px, 3.5vw, 18px);
+    transition: 0.1s; 
+    user-select: none;
+}
+
+.key:active { transform: translateY(2px); border-bottom-width: 1px; }
+
+/* Các phím đặc biệt */
+.key.spec { width: clamp(55px, 12vw, 85px); font-size: 11px; background: #444; }
+.key.space { width: clamp(150px, 35vw, 380px); }
+.key.enter { width: clamp(80px, 16vw, 110px); background: #e67e22; border-bottom-color: #a04000; }
+.key.save { width: clamp(55px, 12vw, 85px); background: #27ae60; border-bottom-color: #1a6030; }
+.caps-active { background: #ff88aa !important; color: #000 !important; }
+
+@media (max-width: 600px) {
+    .row { gap: 2px; }
+    .key { margin: 1px; }
+}}
 
 .row { display: flex; justify-content: center; margin: 5px 0; gap: 4px; }
 
