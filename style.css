@@ -1,4 +1,3 @@
-/* Reset lại toàn bộ để tránh lỗi trình duyệt */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -7,34 +6,94 @@
 
 body { 
     background-color: #FFDDEE; 
-    min-height: 100vh;
     font-family: 'Courier New', Courier, monospace;
-    overflow-x: hidden;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden; /* Ngăn toàn bộ trang bị cuộn lộn xộn */
 }
 
-/* Khung layout chính - Cưỡng ép căn giữa */
-.app-layout {
+.app-wrapper {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Căn giữa theo chiều ngang */
-    width: 100%;
-    padding: 20px 0;
+    height: 100vh;
 }
 
-/* Tờ giấy */
+/* KHU VỰC GIẤY: Chiếm phần trên, cho phép cuộn */
+.paper-section {
+    flex: 1; /* Chiếm hết diện tích còn lại phía trên bàn phím */
+    overflow-y: auto; /* Cho phép cuộn giấy khi viết dài */
+    display: flex;
+    justify-content: center; /* Căn giữa tờ giấy theo chiều ngang */
+    padding: 20px 0 250px 0; /* Padding dưới 250px để giấy không bị bàn phím che mất dòng cuối */
+}
+
 #paper-wrapper { 
     background-color: #f4f1ea; 
     width: 90%; 
-    max-width: 900px; /* Giới hạn độ rộng vừa phải */
+    max-width: 800px; 
     padding: 40px; 
     border-radius: 4px; 
-    box-shadow: 0 10px 40px rgba(0,0,0,0.1); 
-    margin-bottom: 30px;
-    /* Đảm bảo tờ giấy tự căn giữa trong flex container */
-    margin-left: auto;
-    margin-right: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    min-height: 400px;
+    height: fit-content;
 }
 
+#paper { 
+    outline: none; 
+    font-size: clamp(18px, 3vw, 24px); 
+    color: #333; 
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* KHU VỰC BÀN PHÍM: Luôn nằm cố định ở đáy */
+.keyboard-section {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #1a1a1a;
+    padding: 15px 0 25px 0;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+    z-index: 100;
+}
+
+.keyboard-unit {
+    width: fit-content;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.row { display: flex; justify-content: center; margin: 3px 0; width: 100%; }
+
+.key { 
+    width: clamp(35px, 8.5vw, 50px); 
+    height: clamp(45px, 10vw, 55px);
+    background: #3a3a3a; color: white; margin: 3px; 
+    border-radius: 8px; display: flex; align-items: center; justify-content: center; 
+    border: 2px solid #222; box-shadow: 0 4px #000; 
+    cursor: pointer; font-weight: bold; font-size: clamp(14px, 3vw, 18px);
+    user-select: none; transition: 0.05s;
+}
+
+.key:active { transform: translateY(4px); box-shadow: none; background: #555; }
+
+.key.special { width: clamp(55px, 12vw, 85px); font-size: 11px; }
+.key.space { width: clamp(150px, 40vw, 350px); }
+.key.enter { width: clamp(80px, 16vw, 110px); background: #e67e22; }
+#btn-save { background: #27ae60; }
+.caps-active { background: #ff88aa !important; box-shadow: 0 0 15px #ff88aa; }
+
+/* Tối ưu riêng cho mobile: Phím nhỏ lại xíu để dàn hàng đẹp */
+@media screen and (max-width: 600px) {
+    #paper-wrapper { width: 95%; padding: 20px; }
+    .key { margin: 1px; }
+}
 #paper { 
     outline: none; 
     font-size: clamp(18px, 3vw, 26px); 
