@@ -1,9 +1,5 @@
 const kbContent = document.getElementById('keyboard-content');
-const btnToggle = document.getElementById('btn-toggle');
-const btnCaps = document.getElementById('btn-caps');
-const btnSave = document.getElementById('btn-save');
 const paper = document.getElementById('paper');
-
 const clickSound = new Audio('https://www.soundjay.com/communication/typewriter-key-1.mp3');
 
 let isNumbers = false;
@@ -15,7 +11,7 @@ const layouts = {
 };
 
 function renderKeyboard() {
-    kbContent.innerHTML = ''; // Xóa sạch để không bị lặp phím
+    kbContent.innerHTML = '';
     const layout = isNumbers ? layouts.num : layouts.abc;
 
     layout.forEach(row => {
@@ -33,8 +29,59 @@ function renderKeyboard() {
                 e.preventDefault();
                 handleInput(key);
             };
-            keyDiv.addEventListener('touchstart', handleAction, {passive: false});
             keyDiv.addEventListener('mousedown', handleAction);
+            keyDiv.addEventListener('touchstart', handleAction, {passive: false});
+            
+            rowDiv.appendChild(keyDiv);
+        });
+        kbContent.appendChild(rowDiv);
+    });
+    document.getElementById('btn-toggle').innerText = isNumbers ? 'ABC' : '123';
+}
+
+function handleInput(key) {
+    clickSound.currentTime = 0;
+    clickSound.play().catch(() => {});
+
+    if (key === 'Backspace') {
+        paper.innerText = paper.innerText.slice(0, -1);
+    } else if (key === 'Enter') {
+        paper.innerHTML += '<br>';
+    } else if (key === ' ') {
+        paper.innerHTML += '\u00A0';
+    } else if (key !== 'Backspace') {
+        let char = key;
+        if (!isNumbers) char = isCaps ? key.toUpperCase() : key.toLowerCase();
+        paper.innerText += char;
+    }
+}
+
+// Thiết lập các nút chức năng
+const setupButtons = () => {
+    const btnToggle = document.getElementById('btn-toggle');
+    const btnCaps = document.getElementById('btn-caps');
+    const btnSave = document.getElementById('btn-save');
+
+    const bind = (el, fn) => {
+        el.addEventListener('mousedown', (e) => { e.preventDefault(); fn(); });
+        el.addEventListener('touchstart', (e) => { e.preventDefault(); fn(); }, {passive: false});
+    };
+
+    bind(btnToggle, () => { isNumbers = !isNumbers; renderKeyboard(); });
+    bind(btnCaps, () => { isCaps = !isCaps; btnCaps.classList.toggle('caps-active'); renderKeyboard(); });
+    bind(document.querySelector('.key.space'), () => handleInput(' '));
+    bind(document.querySelector('.key.enter'), () => handleInput('Enter'));
+    bind(btnSave, () => {
+        const blob = new Blob([paper.innerText], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'typing_note.txt';
+        a.click();
+    });
+};
+
+renderKeyboard();
+setupButtons();            keyDiv.addEventListener('mousedown', handleAction);
             
             rowDiv.appendChild(keyDiv);
         });
