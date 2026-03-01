@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Typewriter Fixed Keyboard</title>
+    <title>Typewriter Fixed & Centered</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-wrapper">
-        <div class="paper-section">
+    <div class="app-container">
+        
+        <div class="paper-scroll-area">
             <div id="paper-wrapper">
                 <div id="paper" contenteditable="true" spellcheck="false" autofocus></div>
             </div>
         </div>
 
-        <div class="keyboard-section">
-            <div class="keyboard-unit">
+        <div class="keyboard-fixed-bottom">
+            <div class="keyboard-inner">
                 <div id="keyboard-content"></div>
                 <div class="row">
                     <div class="key special" id="btn-toggle">123</div>
@@ -26,6 +27,7 @@
                 </div>
             </div>
         </div>
+
     </div>
     <script src="script.js"></script>
 </body>
