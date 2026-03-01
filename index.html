@@ -3,28 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Máy Đánh Chữ Hoàn Hảo</title>
+    <title>Typewriter Fixed</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="main-layout">
-        <div class="scroll-container">
-            <div id="paper-wrapper">
-                <div id="paper" contenteditable="true" spellcheck="false" autofocus></div>
-            </div>
-        </div>
-
-        <div class="fixed-keyboard">
-            <div id="keyboard-rows"></div>
-            <div class="row">
-                <div class="key special-btn" id="btn-toggle">123</div>
-                <div class="key special-btn" id="btn-caps">CAPS</div>
-                <div class="key space-bar">SPACE</div>
-                <div class="key enter-btn">RETURN</div>
-                <div class="key save-btn" id="btn-save">SAVE</div>
-            </div>
+    <div class="paper-area">
+        <div id="paper-wrapper">
+            <div id="paper" contenteditable="true" spellcheck="false" autofocus></div>
         </div>
     </div>
+
+    <div class="keyboard-section">
+        <div id="keyboard-content" style="width: 100%;"></div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
