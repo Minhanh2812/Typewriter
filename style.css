@@ -4,37 +4,62 @@ body {
     background-color: #FFDDEE; 
     font-family: 'Courier New', Courier, monospace;
     height: 100vh; width: 100vw; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center;
 }
 
-.main-layout { display: flex; flex-direction: column; height: 100vh; width: 100%; }
-
-/* VÙNG GIẤY CĂN GIỮA VÀ SÁT LỀ TRÊN */
-.scroll-container {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    justify-content: center; /* Căn giữa ngang */
-    padding-top: 10px; /* Sát lề trên */
-    padding-bottom: 350px; /* Chừa chỗ cho bàn phím không che mất chữ */
+/* VÙNG GIẤY: Căn giữa, sát trên, tự cuộn */
+.scroll-wrapper {
+    width: 100%; flex: 1;
+    overflow-y: auto; display: flex; justify-content: center;
+    padding: 20px 0 350px 0; /* Chừa khoảng trống cực lớn ở dưới cho bàn phím */
 }
 
-#paper-wrapper { 
+#paper-container { 
     background-color: #f4f1ea; 
-    width: 90%; max-width: 850px; 
-    min-height: 600px; padding: 40px; 
-    border-radius: 2px; 
-    box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+    width: 90%; max-width: 800px; 
+    min-height: 500px; padding: 40px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    align-self: flex-start; /* Ép sát lên trên */
 }
 
-#paper { 
-    outline: none; font-size: clamp(18px, 2.5vw, 24px); 
-    line-height: 1.6; color: #333; white-space: pre-wrap;
-}
+#paper { outline: none; font-size: 22px; line-height: 1.6; color: #333; white-space: pre-wrap; }
 
-/* BÀN PHÍM CỐ ĐỊNH TUYỆT ĐỐI Ở GIỮA ĐÁY */
-.fixed-keyboard {
+/* BÀN PHÍM: Ép hiện ra bằng Position Fixed cụ thể */
+.keyboard-fixed {
     position: fixed;
-    bottom: 0;
+    bottom: 20px; /* Cách đáy một khoảng để chắc chắn không bị ẩn */
+    left: 50%; transform: translateX(-50%); /* Luôn luôn ở giữa */
+    background: #1a1a1a;
+    padding: 15px; border-radius: 20px;
+    box-shadow: 0 -5px 30px rgba(0,0,0,0.4);
+    z-index: 9999;
+    width: auto; min-width: 320px;
+}
+
+.row { display: flex; justify-content: center; margin: 5px 0; gap: 4px; }
+
+.key { 
+    width: clamp(35px, 7vw, 50px); height: clamp(45px, 9vw, 55px);
+    background: #333; color: white; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid #444; border-bottom: 4px solid #000;
+    cursor: pointer; font-weight: bold; font-size: 16px;
+    transition: 0.1s; user-select: none;
+}
+
+.key:active { transform: translateY(2px); border-bottom-width: 1px; }
+
+/* Nút chức năng */
+.key.spec { width: 65px; font-size: 11px; background: #444; }
+.key.space { width: clamp(150px, 30vw, 350px); }
+.key.enter { width: 90px; background: #e67e22; border-bottom-color: #a04000; }
+.key.save { width: 65px; background: #27ae60; border-bottom-color: #1a6030; }
+.caps-active { background: #ff88aa !important; color: #000 !important; }
+
+@media (max-width: 600px) {
+    .keyboard-fixed { width: 100%; border-radius: 0; bottom: 0; padding-bottom: 30px; }
+    .key { margin: 1px; }
+}    bottom: 0;
     left: 50%; /* Đưa về giữa */
     transform: translateX(-50%); /* Cân bằng lại chính giữa */
     background: #1a1a1a;
